@@ -1,5 +1,7 @@
 package com.bolsadeideas.springboot.backend.apirest.models.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.*;
 import javax.validation.constraints.*;
 import java.io.Serializable;
@@ -13,24 +15,31 @@ public class Cliente implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotEmpty
-    @Size(min = 4, max = 12)
+    @NotEmpty(message = "no puede estar vacio")
+    @Size(min = 4, max = 12, message = "el tamaño tiene que estar entre 4 y 12")
     @Column(nullable = false)
     private String nombre;
 
-    @NotEmpty
+    @NotEmpty(message = "no puede estar vacia")
     private String apellido;
 
-    @NotEmpty
-    @Email
+    @NotEmpty(message = "no puede estar vacia")
+    @Email(message = "no es una direccion de correo electronico bien formada")
     @Column(nullable = false, unique = true)
     private String email;
 
+    @NotNull(message = "no puede estar vacia")
     @Column(name = "created_at")
     @Temporal(TemporalType.DATE)
     private Date createdAt;
 
     private String foto;
+
+    @NotNull(message = "la region no puede ser vacia")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "region_id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private Region region;
 
     @PrePersist
     public void prePersist() {
@@ -83,6 +92,14 @@ public class Cliente implements Serializable {
 
     public void setFoto(String foto) {
         this.foto = foto;
+    }
+
+    public Region getRegion() {
+        return region;
+    }
+
+    public void setRegion(Region region) {
+        this.region = region;
     }
 
     private static final long serialVersionUID = 1L;
